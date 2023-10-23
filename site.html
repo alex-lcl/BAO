@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Alexandra LI COMBEAU LONGUET: Document structuré</title>
+<style type="text/css">
+      body {color: black; background-color: white; font-size:12pt; min-width: 1024px; max-width: 1600px;  height:800px;    display: flex;  flex-wrap: wrap; overflow:auto;}
+      .lien { background-color: #191919; color: white; padding:3px; margin:5px;}
+	  .lien:hover {opacity:0.5; background: #191919;}
+	  body > div {  display: flex;  padding: 20px;  margin: 10px 1%;  box-shadow: 0 0 3px rgba(0,0,0,0.05); flex-direction: column;max-height: 800px; overflow:auto;}
+	  .nav {width: 20%; background: #191919; color:white;}
+	  .nav .lien {background-color: #191919; color: white; padding:10px; margin:5px;}
+	  .nav .lien:hover {color: #191919; background: lightgrey; opacity:0.7;}
+	  .page{width: 65%; background-color: white; border: solid 2px #191919;}
+	  a {color: #191919;}
+	  p {padding: 10px;}
+	  blockquote {border-left: #191919 solid 4px; background-color: lightgrey; padding: 10px;}
+  </style>
+</head>
+<body>
+<div class="nav">Je suis Alexandra LI COMBEAU LONGUET, étudiante à l'INALCO. Ce site a été crée dans le cadre du cours "Projet encadré 2" du Master 1 de Traitement Automatique des Langues.
+<a href="#pres" class="lien">Présentation</a>
+<a href="#bao1" class="lien">Boite à Outil 1: le contenu textuel</a>
+<a href="#bao2" class="lien">Boite à Outil 2: étiquetage</a>
+<a href="#bao3" class="lien">Boite à Outil 3: extraction de patron</a>
+<a href="#bao3b" class="lien">Boite à Outil 3: extraction de relations de dépendances</a>
+<a href="#fin" class="lien">Conclusion</a></div>
+<div class="page">
+<h1>Projet: Boite à Outils</h1>
+<div id="pres">
+<h2><a href="#pres">Présentation</a></h2>
+<p>Le projet des boites à outils a pour but d'extraire les titres et description d'un flux RSS afin de les étiqueter et de faire de l'extraction terminologique à partir de patron. Il a également pour but l’apprentissage du langage Perl. Pour ce faire, nous avons réaliser trois boites à outils :</p>
+<p>– BàO1 : extraction de texte (Perl, script de filtrage et de nettoyage…) <br/>
+– BàO2 : Etiquetage (Treetagger, Talismane..) <br/>
+– BàO3 : Extraction terminologique</p>
+<p>Le corpus de fils RSS utilisé est celui du journal Le Monde. Il est constitué de 17 fils RSS archivés une fois par jour à 19h00 sur toute l’année 2020. Chacun des fils est accompagné de sa version « textuelle » (dite profonde) au format Lexico3, format que nous ne traiterons pas : nous nous concentrerons uniquement sur les fichiers au format xml.</p>
+<p>Dans notre projet, nous ne traiterons pas toutes les rubriques/tous les fils RSS. Nous en avons choisi que quatre :</p>
+<p>- la rubrique « international », numéro 3210<br/>
+- la rubrique « Europe », numéro 3214<br/>
+- la rubrique « société », numéro 3224<br/>
+- la rubrique « idées », numéro 3232</p>
+</div>
+<div id="bao1">
+<h2><a href="#bao1">BàO 1: "extraction du texte"</a></h2>
+<p>Le but est de parcourir toute l'arborescence et extraire les contenus textuels de tous les fils.
+On va commencer par extraire tous les titres et descriptions d’un fils RSS. Pour rappel, un fils RSS est un fichier xml répondant à quelques contraintes. En examinant un fils RSS, on repère où se trouve les titres et les descriptions : </p>
+<img src="td.png" title="schéma 1"/>
+<p>On a deux méthodes d’extraction des titres et des descriptions :<ul><li>la première méthode utilise Perl et les expressions régulières : on considère le texte comme un "sacs de caractères" dans lequel on va essayer de repérer certaines régularités.<br/>
+<iframe id="reg" title="méthode 1" width="50%" height="200px" src="prog-enplus/01_titre-description.pl"></iframe>
+</li>
+<li>le seconde méthode utilise Perl et la bibliothèque Perl  XML::RSS : elle prend en considération la structuration xml du texte et la modélisation dans un programme pour au final n'avoir qu'à récupérer les textes voulus.<br/>
+<iframe id="xml-rss" title="méthode 2" width="50%" height="200px" src="prog-enplus/01_xml-rss.pl"></iframe>
+</li>
+</ul></p>
+<p>Maintenant, il nous faut traiter chaque fichier dans l’arborescence des fichiers du corpus. Pour cela, on va utiliser une fonction récursive. Cette dernière fonctionne ainsi :
+<ul><li>Fonction Lecture (Repertoire)
+<ul><li>Pour chaque élément dans Repertoire :
+<ul><li>Si l’élément est un fichier, alors on le traite</li>
+<li>Si l’élément est un répertoire, alors on lance la fonction Lecture(élément)</li></ul></li></ul></li>
+<li><iframe id="lecture" title="lecture de l’arborescence" width="50%" height="200px" src="prog-enplus/01_parcours-arborescence-fichiers.pl"></iframe></li></ul>
+</p>
+<p>Pour finaliser cette première boite à outil, on va assembler le script de parcours dans l’arborescence de fichier à celui d’extraction des titres et des descriptions. 
+<br/>
+On a donc deux scripts :<br/>
+Un script utilisant les expressions régulières : <a href="BAO/BAO1_parcours-arborescence-fichiers-regexp.pl" class="lien"> BAO1_parcours-arborescence-fichiers-regexp.pl</a> <br/>
+Un script utilisant la bibliothèque XML ::RSS : <a href="BAO/BAO1_parcours-arborescence-fichiers-rss.pl" class="lien"> BAO1_parcours-arborescence-fichiers-rss.pl</a></p>
+<p>On constate que le script utilisant les expressions régulières est plus rapide que celui utilisant la bibliothèque XML ::RSS, on va donc le conserver pour la BàO 2.</p>
+<p>Voici les résultats de la BAO 1 :<br/><br/>
+Les sorties au format texte : <a href="BAO/sortie-slurp_3210.txt" class="lien">sortie-slurp_3210.txt</a>, <a href="BAO/sortie-slurp_3224.txt" class="lien">sortie-slurp_3224.txt</a>, <a href="BAO/sortie-slurp_3214.txt" class="lien">sortie-slurp_3214.txt</a>, <a href="BAO/sortie-slurp_3232.txt" class="lien">sortie-slurp_3232.txt</a><br/>
+Les sorties au format xml : <a href="BAO/sortiexml-slurp_3210.xml" class="lien">sortiexml-slurp_3210.xml</a>, <a href="BAO/sortiexml-slurp_3224.xml" class="lien">sortiexml-slurp_3224.xml</a>, <a href="BAO/sortiexml-slurp_3214.xml" class="lien">sortiexml-slurp_3214.xml</a>, <a href="BAO/sortiexml-slurp_3232.xml" class="lien">sortiexml-slurp_3232.xml</a>
+</p>
+</div>
+<div id="bao2">
+<h2><a href="#bao2">BàO 2: "étiquetage du texte"</a></h2>
+<p>Les contenus textuels extraits doivent maintenant être étiquetés automatiquement en utilisant Treetagger et UDpipe pour de l’annotation en morpho-syntaxe et en dépendances.</p>
+<p>La BàO1 produit 2 sorties, à savoir un fichier texte et un fichier XML. On va donc enrichir le fichier XML par un étiquetage via TreeTagger. On va aussi utiliser le fichier texte pour étiqueter via UDpipe.</p>
+<p>Pour mettre en œuvre cet boite à outil, deux stratégies s’offrent à nous : annoter "au fil de l'eau" (c’est-à-dire dès qu'on extrait le texte) ou globalement (c’est-à-dire sur l'ensemble des données extraites). <br/> Quelle est la meilleure solution à adopter ? Pour le savoir, on va tester les deux méthodes.</p>
+<p>Voici le script de la méthode "au fil de l'eau:<br/>
+<iframe id="fil" title="fil de l'eau" width="50%" height="200px" src="BAO/BAO2_parcours-arborescence-fichiers-regexp-ligne.pl"></iframe><br/>
+Voici le script de la méthode "globale":<br/>
+<iframe id="fil" title="fil de l'eau" width="50%" height="200px" src="BAO/BAO2_parcours-arborescence-fichiers-regexp-global.pl"></iframe></p>
+<p>On constate sans équivoque que la méthode "globale" est plus rapide que la méthode "au fil de l'eau". En effet, dans la méthode "au fil de l'eau", le programme ne cesse d'ouvrir et fermer des fichiers, ce qui ralenti considérablement le temps de traitement (surtout en considérant le nombre de fichier qu'on traite au totale). Voici donc l'option retenue pour la BàO 2: <a href="BAO/BAO2_parcours-arborescence-fichiers-regexp-global.pl" class="lien">BAO2_parcours-arborescence-fichiers-regexp-global.pl</a></p>
+<p>Voici les résultats de la BàO 2 :<br/><br/>
+Les sorties de l'étiquetage UDpipe au format conll: <a href="BAO/sortieudpipe-slurp_3210.txt" class="lien">sortieudpipe-slurp_3210.txt</a>, <a href="BAO/sortieudpipe-slurp_3224.txt" class="lien">sortieudpipe-slurp_3224.txt</a>, <a href="BAO/sortieudpipe-slurp_3214.txt" class="lien">sortieudpipe-slurp_3214.txt</a>, <a href="BAO/sortieudpipe-slurp_3232.txt" class="lien">sortieudpipe-slurp_3232.txt</a><br/><br/>
+Les sorties de l'étiquetage UDpipe au format xml: <a href="BAO/sortieudpipe-slurp_3210.txt.xml" class="lien">sortieudpipe-slurp_3210.txt.xml</a>, <a href="BAO/sortieudpipe-slurp_3224.txt.xml" class="lien">sortieudpipe-slurp_3224.txt.xml</a>, <a href="BAO/sortieudpipe-slurp_3214.txt.xml" class="lien">sortieudpipe-slurp_3214.txt.xml</a>, <a href="BAO/sortieudpipe-slurp_3232.txt.xml" class="lien">sortieudpipe-slurp_3232.txt.xml</a><br/><br/>
+Les sorties Treetagger au format xml : <a href="BAO/sortiexml-slurp_TT_3210.txt.xml" class="lien">sortiexml-slurp_TT_3210.txt.xml</a>, <a href="BAO/sortiexml-slurp_TT_3224.xml" class="lien">sortiexml-slurp_TT_3224.xml</a>, <a href="BAO/sortiexml-slurp_TT_3214.xml" class="lien">sortiexml-slurp_TT_3214.xml</a>, <a href="BAO/sortiexml-slurp_TT_3232.xml" class="lien">sortiexml-slurp_TT_3232.xml</a>
+</div>
+<div id="bao3">
+<h2><a href="#bao3">BàO 3: "extraction de patron"</a></h2>
+<p>On va rechercher et extraire des termes sur les données étiquetées grâce aux étiquettes morpho-syntaxiques.<br/><br/>
+Voici les patrons recherchés :<br/>
+NOM PREP NOM PREP<br/>
+VERBE DET NOM<br/>
+NOM ADJ<br/>
+ADJ NOM<br/>
+ADJ NOM NOM<br/>
+ADJ ADJ NOM</p>
+<h3>Solution 1: XSLT</h3>
+<p>Comme vu dans le cours "Document structuré", on peut récupérer les termes utilisant les patrons avec une feuille de style XSLT sur un fichier xml (les fichiers xml utilisés sont ceux étiqueté avec TreeTagger)</p>
+<p>ADJ ADJ NOM: <a href="BAO/BAO3_patron-extraction_ADJADJNOM.xsl" class="lien">BAO3_patron-extraction_ADJADJNOM.xsl</a>, <a href="BAO/extraction/_extraction-xsl_TT_3210-ADJADJNOM.txt" class="lien">_extraction-xsl_TT_3210-ADJADJNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3214-ADJADJNOM.txt" class="lien">_extraction-xsl_TT_3214-ADJADJNOM.txt</a>,<a href="BAO/extraction/_extraction-xsl_TT_3224-ADJADJNOM.txt" class="lien">_extraction-xsl_TT_3224-ADJADJNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3232-ADJADJNOM.txt" class="lien">_extraction-xsl_TT_3232-ADJADJNOM.txt</a></p>
+<p>ADJ NOM: <a href="BAO/BAO3_patron-extraction_ADJNOM.xsl" class="lien">BAO3_patron-extraction_ADJNOM.xsl</a>, <a href="BAO/extraction/_extraction-xsl_TT_3210-ADJNOM.txt" class="lien">_extraction-xsl_TT_3210-ADJNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3214-ADJNOM.txt" class="lien">_extraction-xsl_TT_3214-ADJNOM.txt</a>,<a href="BAO/extraction/_extraction-xsl_TT_3224-ADJNOM.txt" class="lien">_extraction-xsl_TT_3224-ADJNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3232-ADJNOM.txt" class="lien">_extraction-xsl_TT_3232-ADJNOM.txt</a></p>
+<p>ADJ NOM NOM: <a href="BAO/BAO3_patron-extraction_ADJNOMNOM.xsl" class="lien">BAO3_patron-extraction_ADJNOMNOM.xsl</a>, <a href="BAO/extraction/_extraction-xsl_TT_3210-ADJNOMNOM.txt" class="lien">_extraction-xsl_TT_3210-ADJNOMNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3214-ADJNOMNOM.txt" class="lien">_extraction-xsl_TT_3214-ADJNOMNOM.txt</a>,<a href="BAO/extraction/_extraction-xsl_TT_3224-ADJNOMNOM.txt" class="lien">_extraction-xsl_TT_3224-ADJNOMNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3232-ADJNOMNOM.txt" class="lien">_extraction-xsl_TT_3232-ADJNOMNOM.txt</a></p>
+<p>NOM ADJ: <a href="BAO/BAO3_patron-extraction_NOMADJ.xsl" class="lien">BAO3_patron-extraction_NOMADJ.xsl</a>, <a href="BAO/extraction/_extraction-xsl_TT_3210-NOMADJ.txt" class="lien">_extraction-xsl_TT_3210-NOMADJ.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3214-NOMADJ.txt" class="lien">_extraction-xsl_TT_3214-NOMADJ.txt</a>,<a href="BAO/extraction/_extraction-xsl_TT_3224-NOMADJ.txt" class="lien">_extraction-xsl_TT_3224-NOMADJ.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3232-NOMADJ.txt" class="lien">_extraction-xsl_TT_3232-NOMADJ.txt</a></p>
+<p>NOM PREP NOM PREP: <a href="BAO/BAO3_patron-extraction_NOMPREPNOM.xsl" class="lien">BAO3_patron-extraction_NOMPREPNOM.xsl</a>, <a href="BAO/extraction/_extraction-xsl_TT_3210-NOMPREPNOMPREP.txt" class="lien">_extraction-xsl_TT_3210-NOMPREPNOMPREP.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3214-NOMPREPNOMPREP.txt" class="lien">_extraction-xsl_TT_3214-NOMPREPNOMPREP.txt</a>,<a href="BAO/extraction/_extraction-xsl_TT_3224-NOMPREPNOMPREP.txt" class="lien">_extraction-xsl_TT_3224-NOMPREPNOMPREP.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3232-NOMPREPNOMPREP.txt" class="lien">_extraction-xsl_TT_3232-NOMPREPNOMPREP.txt</a></p>
+<p>VERB DET NOM: <a href="BAO/BAO3_patron-extraction_VERDETNOM.xsl" class="lien">BAO3_patron-extraction_VERDETNOM.xsl</a>, <a href="BAO/extraction/_extraction-xsl_TT_3210-VERDETNOM.txt" class="lien">_extraction-xsl_TT_3210-VERDETNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3214-VERDETNOM.txt" class="lien">_extraction-xsl_TT_3214-VERDETNOM.txt</a>,<a href="BAO/extraction/_extraction-xsl_TT_3224-VERDETNOMtxt" class="lien">_extraction-xsl_TT_3224-VERDETNOM.txt</a>, <a href="BAO/extraction/_extraction-xsl_TT_3232-VERDETNOM.txt" class="lien">_extraction-xsl_TT_3232-VERDETNOM.txt</a></p>
+<h3>Solution 2: XQUERY</h3>
+<p>On peut faire la même chose en XQUERY. Cette fois-ci, on va essayer d'extraire tous les patrons d'un coup pour un fichier xml étiqueté par Teetagger.</p>
+<p>Rubrique 3210: <a href="BAO/BAO3_extraction-xq_TT_3210.xq" class="lien">BAO3_extraction-xq_TT_3210.xq</a>, <a href="BAO/extraction/_extraction-xq_TT_3210.txt" class="lien">_extraction-xq_TT_3210.txt</a></p>
+<p>Rubrique 3214: <a href="BAO/BAO3_extraction-xq_TT_3214.xq" class="lien">BAO3_extraction-xq_TT_3214.xq</a>, <a href="BAO/extraction/_extraction-xq_TT_3214.txt" class="lien">_extraction-xq_TT_3214.txt</a></p>
+<p>Rubrique 3224: <a href="BAO/BAO3_extraction-xq_TT_3224.xq" class="lien">BAO3_extraction-xq_TT_3224.xq</a>, <a href="BAO/extraction/_extraction-xq_TT_3224.txt" class="lien">_extraction-xq_TT_3224.txt</a></p>
+<p>Rubrique 3232: <a href="BAO/BAO3_extraction-xq_TT_3232.xq" class="lien">BAO3_extraction-xq_TT_3232.xq</a>, <a href="BAO/extraction/_extraction-xq_TT_3232.txt" class="lien">_extraction-xq_TT_3232.txt</a></p>
+<h3>Solution 3: Perl</h3>
+<p>Monsieur Jeam-Michel Daube nous a présenté une solution en utilsiant Perl sur les fichiers texte UDpipe: <a href="BAO/BAO3_extrait_termino_udpipe.pl" class="lien">BAO3_extrait_termino_udpipe.pl</a><br/><br/>Exemple d'execution: Perl BAO3_extrait_termino_udpipe.pl sortieudpipe-slurp_3210.txt patterns_udpipe.txt</p>
+<p>Rubrique 3210: <a href="BAO/extraction/_extraction-perl_udpipe_3210.txt" class="lien">_extraction-perl_udpipe_3210.txt</a></p>
+<p>Rubrique 3214: <a href="BAO/extraction/_extraction-perl_udpipe_3214.txt" class="lien">_extraction-perl_udpipe_3214.txt</a></p>
+<p>Rubrique 3224: <a href="BAO/extraction/_extraction-perl_udpipe_3224.txt" class="lien">_extraction-perl_udpipe_3224.txt</a></p>
+<p>Rubrique 3232: <a href="BAO/extraction/_extraction-perl_udpipe_3232.txt" class="lien">_extraction-perl_udpipe_3232.txt</a></p>
+<p>On a fait la même chose avec les sorties intermédiaires texte de  TreeTagger:<a href="BAO/BAO3_extrait_termino_TT.pl" class="lien">BAO3_extrait_termino_TT.pl</a></p>
+<p>Exemple d'execution: Perl BAO3_extrait_termino_TT.pl sortiexml-slurp_TT_3210.txt patterns_udpipe.txt</p>
+<p>Rubrique 3210: <a href="BAO/extraction/_extraction-perl_TT_3210.txt" class="lien">_extraction-perl_udpipe_3210.txt</a></p>
+<p>Rubrique 3214: <a href="BAO/extraction/_extraction-perl_TT_3214.txt" class="lien">_extraction-perl_udpipe_3214.txt</a></p>
+<p>Rubrique 3224: <a href="BAO/extraction/_extraction-perl_TT_3224.txt" class="lien">_extraction-perl_udpipe_3224.txt</a></p>
+<p>Rubrique 3232: <a href="BAO/extraction/_extraction-perl_TT_3232.txt" class="lien">_extraction-perl_udpipe_3232.txt</a></p>
+<p>On constate que la solution la plus pratique est Perl. En effet, que ce soit pour la solution XSLT ou XQUERY, on doit écrire explicitement le patron dans le code, ce qui peut ammener à des erreurs. Ce n'est pas le cas en Perl, où on la liste des patrons est dans un autre fichier texte. De plus, la solution perl à l'aventage d'être généralisable à tout patrons qu'on veut extraire: il n'y a pas besoin d'ajouter des lignes de codes en plus.</p>
+</div>
+<div id="bao3b">
+<h2><a href="#bao3b">BàO 3: "extraction de relation de dépendances"</a></h2>
+<p>On va rechercher et extraire des termes sur les données étiquetées UDpipe grâce aux relations de dépendances. Ov va, plus précisément, chercher tous les mots connecté dans une relation du type "obj". Pour cela, on va procéder ainsi:</p>
+<ul><li>Pour chaque pharse p dans le fichier xml</li><li>pour chaque balise <item> dans la phrase p
+<ul><li>Si l'item (a[8]) contient une relation "obj"<ul><li>Récupération de la forme de l'item dépendant (a[2])</li><li>Récupération de la position de l'item (a[1])</li><li>Récupération de la position du gouverneur de l'item (a[7])</li><li>Si le gouverneur est avant : <br/> alors on cherche le frère de l'item (preceding::item), et on imprime la forme de l'item et la forme de l'item frère.</li><li>Si le gouverneur est après:<br/> alors on cherche le frère de l'item (following::item), et on imprime la forme de l'item et la forme de l'item frère</li></ul></li></ul></li></ul>
+<h3>Solution XSLT</h3>
+<p>Exemple d'execution: xsltproc BAO3_relation-OBJ-UD.xsl sortieudpipe-slurp_3232.txt.xml | sort | uniq -c |sort -rn > extraction/_OBJ_xsl_3232.txt</p>
+<p>Le fichier xsl: <a href="BAO/BAO3_relation-OBJ-UD.xsl" class="lien">BAO3_relation-OBJ-UD.xsl</a></p>
+<p>Rubrique 3210: <a href="BAO/extraction/_OBJ_xsl_3210.txt" class="lien">_OBJ_xsl_3210.txt</a></p>
+<p>Rubrique 3214: <a href="BAO/extraction/_OBJ_xsl_3214.txt" class="lien">_OBJ_xsl_3214.txt</a></p>
+<p>Rubrique 3224: <a href="BAO/extraction/_OBJ_xsl_3224.txt" class="lien">_OBJ_xsl_3224.txt</a></p>
+<p>Rubrique 3232: <a href="BAO/extraction/_OBJ_xsl_3232.txt" class="lien">_OBJ_xsl_3232.txt</a></p>
+<h3>Solution XQUERY</h3>
+<p>Rubrique 3210: <a href="BAO/BAO3_extract-OBJ-udpipe-sort_3210.xq" class="lien">BAO3_extract-OBJ-udpipe-sort_3210.xq</a>, <a href="BAO/extraction/_OBJ_3210.txt" class="lien">_OBJ_xsl_3210.txt</a></p>
+<p>Rubrique 3214: <a href="BAO/BAO3_extract-OBJ-udpipe-sort_3214.xq" class="lien">BAO3_extract-OBJ-udpipe-sort_3214.xq</a>, <a href="BAO/extraction/_OBJ_3214.txt" class="lien">_OBJ_xsl_3214.txt</a></p>
+<p>Rubrique 3224: <a href="BAO/BAO3_extract-OBJ-udpipe-sort_3224.xq" class="lien">BAO3_extract-OBJ-udpipe-sort_3224.xq</a>,<a href="BAO/extraction/_OBJ_3224.txt" class="lien">_OBJ_xsl_3224.txt</a></p>
+<p>Rubrique 3232: <a href="BAO/BAO3_extract-OBJ-udpipe-sort_3232.xq" class="lien">BAO3_extract-OBJ-udpipe-sort_3232.xq</a>,<a href="BAO/extraction/_OBJ_3232.txt" class="lien">_OBJ_xsl_3232.txt</a></p>
+<h3>Solution Perl</h3>
+<p>Pour "capturer" les termes voulus comme en XSLT ou XQUERY, on va utiliser les expressions régulières.</p>
+<p>Le fichier perl: <a href="BAO/BAO3_extract-relation-udpipe.pl" class="lien">BAO3_extract-relation-udpipe.pl</a></p>
+<p>Exemple d'execution: perl BAO3_extract-relation-udpipe.pl sortieudpipe-slurp_3232.txt.xml "OBJ" > extraction/_OBJ_perl_3232.txt</p>
+<p>Rubrique 3210: <a href="BAO/extraction/_OBJ_perl_3210.txt" class="lien">_OBJ_perl_3210.txt</a></p>
+<p>Rubrique 3214: <a href="BAO/extraction/_OBJ_perl_3214.txt" class="lien">_OBJ_perl_3214.txt</a></p>
+<p>Rubrique 3224: <a href="BAO/extraction/_OBJ_perl_3224.txt" class="lien">_OBJ_perl_3224.txt</a></p>
+<p>Rubrique 3232: <a href="BAO/extraction/_OBJ_perl_3232.txt" class="lien">_OBJ_perl_3232.txt</a></p>
+<p>Encore une fois, on constate que la solution Perl est plus efficasse. En effet, le programme peut extraire les gouverneurs et les dépendants de n'importe quelle relation de dépendance indiquée en argument. Au contraire, pour les solutions XQUERY ou XSLT, il faut écrire un code pour chaque relation qu'on veut extraire.</p>
+</div>
+<div id="fin">
+<h2><a href="#fin">Conclusion</a></h2>
+<p>En réalisant ce projet, j'ai appris à envisager plusieurs solutions à un même problème et à choisir l'option à plus efficasse au vu de l'objectif à atteindre. J'ai également appris le langage Perl, et j'ai compris le formidable outil que sont les expressions régulières utilisé par Perl.</p>
+<p>Pour terminer, voici de beaux graphes obtenus grâce à l'outil "Patron2graph" sur les fichiers text d'extraction de relation de type "OBJ" et sur les fichiers textes d'extraction de patron TreeTagger avec Perl: <img src="p2g.png"/></p>
+</div>
+</div>
+@Alexandra LI COMBEAU LONGUET
+</body>
+</html>
